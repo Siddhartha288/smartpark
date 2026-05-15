@@ -698,3 +698,42 @@ footer {
   .search-filters-row { grid-template-columns: 1fr; }
   .stat-card { flex-direction: column; text-align: center; }
 }
+/* ---- Accessibility: Focus-visible styles (WCAG 2.1 AA) ---- */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip-to-content link for screen readers */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: var(--accent);
+  color: var(--primary);
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 0 0 var(--radius) var(--radius);
+  z-index: 9999;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ---- Print styles ---- */
+@media print {
+  .navbar, footer, .btn, .tabs, .admin-sidebar { display: none !important; }
+  body { background: white; color: black; font-size: 12pt; }
+  .card { box-shadow: none; border: 1px solid #ccc; }
+}
