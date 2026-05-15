@@ -19,6 +19,7 @@ $activeNav = $activeNav ?? '';
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <nav class="navbar">
   <div class="nav-inner">
     <a class="nav-brand" href="index.php">
@@ -50,4 +51,4 @@ $activeNav = $activeNav ?? '';
     </button>
   </div>
 </nav>
-<main>
+<main id="main-content">
