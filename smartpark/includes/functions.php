@@ -72,14 +72,14 @@ function formatDuration(int $seconds): string {
     if ($hours > 0)                  return "{$hours}h";
     return "{$minutes}m";
 }
-[15/5/2026, 9:52:35 PM] Sidharth Sathi Wentworth: function calcBookingTotal(string $startTime, string $endTime, float $ratePerHour): float {
+function calcBookingTotal(string $startTime, string $endTime, float $ratePerHour): float {
     $start = strtotime($startTime);
     $end   = strtotime($endTime);
     if (!$start || !$end || $end <= $start) return 0.00;
     $hours = ($end - $start) / 3600;
     return round($hours * $ratePerHour, 2);
 }
-[15/5/2026, 9:52:42 PM] Sidharth Sathi Wentworth: function availabilityLabel(int $available, int $total): array {
+function availabilityLabel(int $available, int $total): array {
     if ($total === 0) return ['label' => 'Unknown', 'class' => 'badge-muted'];
     $pct = ($available / $total) * 100;
     if ($pct > 50) return ['label' => 'Good Availability', 'class' => 'badge-success'];
