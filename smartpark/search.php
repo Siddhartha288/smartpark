@@ -90,6 +90,16 @@ usort($displayParks, function($a, $b) use ($filterSort) {
           </select>
         </div>
 
+        <div class="form-group" style="margin:0;">
+          <label for="sort">↕ Sort By</label>
+          <select name="sort" id="sort">
+            <option value="availability" <?= $filterSort==='availability' ? 'selected':'' ?>>Most Available</option>
+            <option value="rate_asc"     <?= $filterSort==='rate_asc'     ? 'selected':'' ?>>Price: Low to High</option>
+            <option value="rate_desc"    <?= $filterSort==='rate_desc'    ? 'selected':'' ?>>Price: High to Low</option>
+            <option value="name"         <?= $filterSort==='name'         ? 'selected':'' ?>>Name A–Z</option>
+          </select>
+        </div>
+
         <div style="display:flex;align-items:flex-end;">
           <button type="submit" class="btn btn-primary" style="height:42px;">Search</button>
         </div>
