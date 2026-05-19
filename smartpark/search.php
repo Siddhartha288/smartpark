@@ -123,8 +123,13 @@ usort($displayParks, function($a, $b) use ($filterSort) {
     <div class="card text-center" style="padding:3rem;">
       <div style="font-size:3rem;margin-bottom:1rem;">🚗</div>
       <h3>No car parks found</h3>
-      <p class="text-muted mt-1">Try adjusting your search filters.</p>
-      <a href="search.php" class="btn btn-dark mt-2">Clear Filters</a>
+      <p class="text-muted mt-1">No car parks match your current filters. Try:</p>
+      <ul style="text-align:left;display:inline-block;margin:0.75rem 0;color:var(--text-muted);font-size:0.9rem;line-height:2;">
+        <li>Selecting a different suburb</li>
+        <li>Increasing your max hourly rate</li>
+        <li>Clearing all filters to see everything</li>
+      </ul><br>
+      <a href="search.php" class="btn btn-dark mt-2">Clear All Filters</a>
     </div>
   <?php else: ?>
     <div class="grid-2" style="gap:1.25rem;">
