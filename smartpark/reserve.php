@@ -35,6 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $formError = 'End time must be after start time.';
         } elseif (strtotime($startTime) < time() - 120) {
             $formError = 'Start time cannot be in the past.';
+        } elseif ((strtotime($endTime) - strtotime($startTime)) > 43200) {
+            $formError = 'Bookings cannot exceed 12 hours. Please contact us for extended stays.';
         } else {
             $bookingRef = 'SP-' . strtoupper(substr(md5(uniqid()), 0, 8));
             // Production: INSERT into bookings + payments tables via PDO
