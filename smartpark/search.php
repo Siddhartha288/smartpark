@@ -25,6 +25,7 @@ $filterSuburb = trim($_GET['suburb'] ?? '');
 $filterDate   = trim($_GET['date']   ?? date('Y-m-d'));
 $filterTime   = trim($_GET['time']   ?? '');
 $filterMaxRate = floatval($_GET['max_rate'] ?? 0);
+$filterSort    = trim($_GET['sort'] ?? 'availability');
 
 $displayParks = $allParks;
 if ($filterSuburb) {
@@ -33,6 +34,16 @@ if ($filterSuburb) {
 if ($filterMaxRate > 0) {
   $displayParks = array_filter($displayParks, fn($p) => $p['rate'] <= $filterMaxRate);
 }
+
+usort($displayParks, function($a, $b) use ($filterSort) {
+  switch ($filterSort) {
+    case 'rate_asc':  return $a['rate'] <=> $b['rate'];
+    case 'rate_desc': return $b['rate'] <=> $a['rate'];
+    case 'name':      return strcmp($a['name'], $b['name']);
+    default:
+      return ($b['total'] - $b['occupied']) <=> ($a['total'] - $a['occupied']);
+  }
+});
 ?>
 
 <div class="page-header">
