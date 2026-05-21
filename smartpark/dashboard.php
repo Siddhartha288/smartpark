@@ -27,6 +27,8 @@ $upcomingBookings = [
      'start'=>date('Y-m-d H:i', strtotime('+2 days')),
      'end'  =>date('Y-m-d H:i', strtotime('+2 days +1 hour')),'status'=>'confirmed','total'=>4.50],
 ];
+// Remove cancelled booking from the list
+$upcomingBookings = array_filter($upcomingBookings, fn($b) => $b['id'] !== $cancelledId);
 $pastBookings = [
     ['id'=>1,'park'=>'Sydney CBD Parking Centre',    'suburb'=>'Sydney',     'spot'=>'A-05',
      'start'=>date('Y-m-d H:i', strtotime('-5 days')),
@@ -35,6 +37,27 @@ $pastBookings = [
      'start'=>date('Y-m-d H:i', strtotime('-2 days')),
      'end'  =>date('Y-m-d H:i', strtotime('-2 days +3 hours')),'status'=>'completed','total'=>15.00],
 ];
+// If a booking was just cancelled, move it to past bookings
+if ($cancelledId > 0) {
+    foreach ($upcomingBookings as $b) {
+        // Already filtered above, so check original
+    }
+    // Find the cancelled one from the original list and add to past
+    $allUpcoming = [
+        ['id'=>3,'park'=>'Bondi Junction Carpark',    'suburb'=>'Bondi Junction','spot'=>'A-03',
+         'start'=>date('Y-m-d H:i', strtotime('+1 day')),
+         'end'  =>date('Y-m-d H:i', strtotime('+1 day +2 hours')),'status'=>'cancelled','total'=>14.00],
+        ['id'=>5,'park'=>'Chatswood Station Parking',  'suburb'=>'Chatswood',     'spot'=>'B-02',
+         'start'=>date('Y-m-d H:i', strtotime('+2 days')),
+         'end'  =>date('Y-m-d H:i', strtotime('+2 days +1 hour')),'status'=>'cancelled','total'=>4.50],
+    ];
+    foreach ($allUpcoming as $b) {
+        if ($b['id'] === $cancelledId) {
+            $pastBookings[] = $b;
+            break;
+        }
+    }
+}
 $totalSpent    = array_sum(array_column(array_merge($upcomingBookings,$pastBookings),'total'));
 $totalBookings = count($upcomingBookings) + count($pastBookings);
 
@@ -149,7 +172,13 @@ require 'includes/header.php';
                   <td><?= date('d M Y', strtotime($b['start'])) ?><br><span class="text-muted"><?= date('g:i A', strtotime($b['start'])) ?></span></td>
                   <td><?= $h ?>h</td>
                   <td><strong>$<?= number_format($b['total'],2) ?></strong></td>
-                  <td><span class="badge badge-success">Completed</span></td>
+                 <td>
+                    <?php if ($b['status'] === 'cancelled'): ?>
+                      <span class="badge badge-danger">Cancelled</span>
+                    <?php else: ?>
+                      <span class="badge badge-success">Completed</span>
+                    <?php endif; ?>
+                  </td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
