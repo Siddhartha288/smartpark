@@ -7,13 +7,14 @@ requireLogin('login.php');  // redirect before any HTML
 
 // Handle cancel booking POST
 $cancelMsg = '';
+$cancelledId = 0;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_booking'])) {
     if (empty($_POST['csrf_token']) || !verifyCsrfToken($_POST['csrf_token'])) {
         $cancelMsg = 'error:Invalid request. Please try again.';
     } else {
-        $cancelId  = intval($_POST['booking_id']);
+        $cancelledId = intval($_POST['booking_id']);
         // Production: UPDATE bookings SET status='cancelled' WHERE booking_id=? AND user_id=?
-        $cancelMsg = 'success:Booking #' . $cancelId . ' has been cancelled successfully.';
+        $cancelMsg = 'success:Booking #' . $cancelledId . ' has been cancelled successfully.';
     }
 }
 
