@@ -287,7 +287,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <td><?= date('d M Y', strtotime($u['joined'])) ?></td>
                     <td>
                       <?php if ($u['role'] !== 'admin'): ?>
-                        <button class="btn btn-sm btn-danger" onclick="if(confirmDelete('Remove this user?')){}">Remove</button>
+<form method="POST" action="admin.php?section=users" style="display:inline;"
+      onsubmit="return confirm('Remove this user? This cannot be undone.');">
+  <?= csrfField() ?>
+  <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+  <button type="submit" name="remove_user" class="btn btn-sm btn-danger">Remove</button>
+</form>
                       <?php else: ?>
                         <span class="text-muted" style="font-size:0.8rem;">Protected</span>
                       <?php endif; ?>
