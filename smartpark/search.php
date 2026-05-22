@@ -151,12 +151,25 @@ usort($displayParks, function($a, $b) use ($filterSort) {
   <?php else: ?>
     <div class="grid-2" style="gap:1.25rem;">
       <?php foreach ($displayParks as $park):
-        $avail = $park['total'] - $park['occupied'];
-        $pct   = round(($avail / $park['total']) * 100);
-        $fillClass = $pct > 50 ? 'avail-high' : ($pct > 20 ? 'avail-mid' : 'avail-low');
-        $badgeClass = $pct > 50 ? 'badge-success' : ($pct > 20 ? 'badge-warning' : 'badge-danger');
-        $badgeLabel = $pct > 50 ? 'Good Availability' : ($pct > 20 ? 'Limited' : 'Almost Full');
-      ?>
+  $availableSpots = max(0, $park['total'] - $park['occupied']);
+  $availabilityPercent = $park['total'] > 0
+    ? round(($availableSpots / $park['total']) * 100)
+    : 0;
+
+  if ($availabilityPercent > 50) {
+    $fillClass = 'avail-high';
+    $badgeClass = 'badge-success';
+    $badgeLabel = 'Good Availability';
+  } elseif ($availabilityPercent > 20) {
+    $fillClass = 'avail-mid';
+    $badgeClass = 'badge-warning';
+    $badgeLabel = 'Limited Availability';
+  } else {
+    $fillClass = 'avail-low';
+    $badgeClass = 'badge-danger';
+    $badgeLabel = 'Almost Full';
+  }
+?>
         <div class="park-card" data-suburb="<?= h($park['suburb']) ?>" data-rate="<?= $park['rate'] ?>">
           <div class="park-card-header">
             <div>
@@ -170,10 +183,10 @@ usort($displayParks, function($a, $b) use ($filterSort) {
           <div>
             <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;">
               <span class="text-muted">Availability</span>
-              <span><?= $avail ?> of <?= $park['total'] ?> spots free</span>
+<span><?= $availableSpots ?> of <?= $park['total'] ?> spots free</span>
             </div>
             <div class="avail-bar">
-              <div class="avail-fill <?= $fillClass ?>" style="width:<?= $pct ?>%"></div>
+              <div class="avail-fill <?= $fillClass ?>" style="width:<?= $availabilityPercent ?>%"></div>
             </div>
           </div>
 
