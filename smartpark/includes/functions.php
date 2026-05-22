@@ -87,3 +87,9 @@ function availabilityLabel(int $available, int $total): array {
     if ($pct > 0)  return ['label' => 'Almost Full',       'class' => 'badge-danger'];
     return             ['label' => 'Full',               'class' => 'badge-danger'];
 }
+/**
+ * Check if a booking starts within the next 24 hours
+ */
+function isBookingSoon(string $startTime): bool {
+    return strtotime($startTime) <= (time() + 86400);
+}

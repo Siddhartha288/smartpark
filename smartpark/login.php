@@ -1,13 +1,10 @@
 <?php
 /**
  * SmartPark - Login (login.php)
- * POST logic runs BEFORE header.php outputs HTML so header() redirects work.
+ * ICT312 Advanced Web Information Systems
  */
-
-// Load helpers only (no HTML yet)
 require_once 'includes/functions.php';
 
-// Redirect logged-in users away
 if (isLoggedIn()) {
     header('Location: ' . (isAdmin() ? 'admin.php' : 'dashboard.php'));
     exit;
@@ -15,15 +12,6 @@ if (isLoggedIn()) {
 
 $formError = '';
 $formEmail = '';
-
-// Demo users - password is: Admin@1234
-// Using direct comparison for demo; production would use password_verify() with DB hash
-$demoUsers = [
-    'admin@smartpark.com' => ['id'=>1,'name'=>'Admin User',   'role'=>'admin',  'password'=>'Admin@1234'],
-    'jane@example.com'    => ['id'=>2,'name'=>'Jane Smith',   'role'=>'driver', 'password'=>'Admin@1234'],
-    'mark@example.com'    => ['id'=>3,'name'=>'Mark Johnson', 'role'=>'driver', 'password'=>'Admin@1234'],
-    'lucy@example.com'    => ['id'=>4,'name'=>'Lucy Chen',    'role'=>'driver', 'password'=>'Admin@1234'],
-];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -43,26 +31,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $formError = 'Please enter a valid email address.';
         } else {
-            $user = $demoUsers[$email] ?? null;
+            try {
+                $db   = getDB();
+                $stmt = $db->prepare("
+                    SELECT user_id, name, email, password_hash, role
+                    FROM users
+                    WHERE email = ?
+                    LIMIT 1
+                ");
+                $stmt->execute([$email]);
+                $user = $stmt->fetch();
 
-            // Demo: direct string compare. Production: password_verify($password, $user['hash'])
-            if ($user && $password === $user['password']) {
-                session_regenerate_id(true);
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['name']    = $user['name'];
-                $_SESSION['email']   = $email;
-                $_SESSION['role']    = $user['role'];
-                $_SESSION['flash_success'] = 'Welcome back, ' . $user['name'] . '!';
-                header('Location: ' . ($user['role'] === 'admin' ? 'admin.php' : 'dashboard.php'));
-                exit;
-            } else {
-                $formError = 'Incorrect email or password. Please try again.';
+                if ($user && password_verify($password, $user['password_hash'])) {
+                    // Update last login
+                    $db->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?")
+                       ->execute([$user['user_id']]);
+
+                    // Log event
+                    $db->prepare("
+                        INSERT INTO audit_log (user_id, event_type, description, ip_address)
+                        VALUES (?, 'login', 'User login successful', ?)
+                    ")->execute([$user['user_id'], $_SERVER['REMOTE_ADDR'] ?? '']);
+
+                    session_regenerate_id(true);
+                    $_SESSION['user_id'] = $user['user_id'];
+                    $_SESSION['name']    = $user['name'];
+                    $_SESSION['email']   = $user['email'];
+                    $_SESSION['role']    = $user['role'];
+                    $_SESSION['flash_success'] = 'Welcome back, ' . $user['name'] . '!';
+                    header('Location: ' . ($user['role'] === 'admin' ? 'admin.php' : 'dashboard.php'));
+                    exit;
+
+                } else {
+    // Log failed attempt
+    $db->prepare("
+        INSERT INTO audit_log (user_id, event_type, description, ip_address)
+        VALUES (NULL, 'login_failed', ?, ?)
+    ")->execute(['Failed login for: ' . $email, $_SERVER['REMOTE_ADDR'] ?? '']);
+
+    $formError = 'Incorrect email or password. Please try again.';
+}
+
+            } catch (PDOException $e) {
+                error_log('[SmartPark Login] ' . $e->getMessage());
+                $formError = 'A system error occurred. Please try again later.';
             }
         }
     }
 }
 
-// NOW output HTML
 $pageTitle = 'Log In';
 $activeNav = '';
 require 'includes/header.php';
@@ -78,15 +95,6 @@ require 'includes/header.php';
 
 <div class="container-sm" style="padding-top:2rem;padding-bottom:3rem;">
 
-  <div class="alert alert-info" style="margin-bottom:1rem;">
-    <span>&#x1F4A1;</span>
-    <div>
-      <strong>Demo Credentials:</strong><br>
-      Admin: admin@smartpark.com &nbsp;/&nbsp; Admin@1234<br>
-      Driver: jane@example.com &nbsp;/&nbsp; Admin@1234
-    </div>
-  </div>
-
   <?php if ($formError): ?>
     <div class="alert alert-danger">
       <span>&#x274C;</span><span><?= h($formError) ?></span>
@@ -99,7 +107,7 @@ require 'includes/header.php';
   <div class="card">
     <div class="card-header"><h3>&#x1F510; Log In</h3></div>
 
-    <form method="POST" action="login.php" id="loginForm" novalidate>
+    <form method="POST" action="login.php" novalidate>
       <?= csrfField() ?>
 
       <div class="form-group">
@@ -117,15 +125,20 @@ require 'includes/header.php';
                autocomplete="current-password"
                placeholder="Your password"
                required>
-        <div class="hint">Forgot your password? <a href="contact.php">Contact us</a> for help.</div>
+        <div class="hint">
+          Forgot your password? <a href="contact.php">Contact us</a> for help.
+        </div>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block btn-lg">Log In &rarr;</button>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">
+        Log In &rarr;
+      </button>
     </form>
   </div>
 
   <p class="text-center text-muted mt-2">
-    Don't have an account? <a href="register.php"><strong>Create one free &rarr;</strong></a>
+    Don't have an account?
+    <a href="register.php"><strong>Create one free &rarr;</strong></a>
   </p>
 </div>
 
