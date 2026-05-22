@@ -354,7 +354,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <td>$<?= number_format($z['rate'], 2) ?></td>
                     <td>
                       <button class="btn btn-sm btn-dark">Edit</button>
-                      <button class="btn btn-sm btn-danger" onclick="confirmDelete('Delete this zone?')">Delete</button>
+                      <form method="POST" action="admin.php?section=zones" style="display:inline;"
+      onsubmit="return confirm('Delete this zone? This cannot be undone.');">
+  <?= csrfField() ?>
+  <input type="hidden" name="zone_id" value="<?= $z['id'] ?>">
+  <button type="submit" name="delete_zone" class="btn btn-sm btn-danger">Delete</button>
+</form>
                     </td>
                   </tr>
                 <?php endforeach; ?>
