@@ -31,6 +31,7 @@ $activeNav = $activeNav ?? '';
       <?php if (isLoggedIn()): ?>
         <li><a href="reserve.php"   <?= $activeNav==='reserve'?'class="active"':'' ?>>Reserve</a></li>
         <li><a href="dashboard.php" <?= $activeNav==='dash'   ?'class="active"':'' ?>>My Dashboard</a></li>
+        <li><a href="subscription.php" <?= $activeNav==='subscription'?'class="active"':'' ?>>&#x1F4C5; Subscribe</a></li>
         <?php if (isAdmin()): ?>
           <li><a href="admin.php" <?= $activeNav==='admin'?'class="active"':'' ?>>Admin</a></li>
         <?php endif; ?>

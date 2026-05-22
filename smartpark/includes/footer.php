@@ -20,6 +20,7 @@
           <li><a href="search.php">Find Parking</a></li>
           <li><a href="reserve.php">Reserve a Spot</a></li>
           <li><a href="contact.php">Contact Us</a></li>
+          <li><a href="subscription.php">Monthly Subscription</a></li>
         </ul>
       </div>
       <div>
