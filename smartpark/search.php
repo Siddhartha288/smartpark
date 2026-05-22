@@ -108,15 +108,32 @@ usort($displayParks, function($a, $b) use ($filterSort) {
   </div>
 
   <!-- Results header -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-    <p class="text-muted">
-      Showing <strong><?= count($displayParks) ?></strong> car park<?= count($displayParks) !== 1 ? 's' : '' ?>
-      <?= $filterSuburb ? ' in <strong>' . h($filterSuburb) . '</strong>' : '' ?>
-    </p>
-    <?php if ($filterSuburb || $filterMaxRate): ?>
-      <a href="search.php" class="text-muted" style="font-size:0.85rem;">✕ Clear filters</a>
+ <div class="search-results-header">
+
+  <?php
+    $parkCount = count($displayParks);
+    $parkLabel = $parkCount === 1 ? 'car park' : 'car parks';
+  ?>
+
+  <p class="text-muted">
+    Showing <strong><?= $parkCount ?></strong> <?= $parkLabel ?>
+
+    <?php if (!empty($filterSuburb)): ?>
+      in <strong><?= h($filterSuburb) ?></strong>
     <?php endif; ?>
-  </div>
+
+    <?php if (!empty($filterMaxRate)): ?>
+      under <strong>$<?= h($filterMaxRate) ?></strong>/hour
+    <?php endif; ?>
+  </p>
+
+  <?php if (!empty($filterSuburb) || !empty($filterMaxRate)): ?>
+    <a href="search.php" class="clear-btn">
+      Reset Search
+    </a>
+  <?php endif; ?>
+
+</div>
 
   <!-- ===== RESULTS GRID ===== -->
   <?php if (empty($displayParks)): ?>
